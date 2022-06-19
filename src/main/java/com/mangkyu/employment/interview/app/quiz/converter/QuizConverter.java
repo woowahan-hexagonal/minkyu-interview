@@ -3,11 +3,11 @@ package com.mangkyu.employment.interview.app.quiz.converter;
 import com.mangkyu.employment.interview.app.quiz.adapter.persistence.QuizEntity;
 import com.mangkyu.employment.interview.app.quiz.adapter.presentation.AddQuizRequest;
 import com.mangkyu.employment.interview.app.quiz.adapter.presentation.GetQuizResponse;
+import com.mangkyu.employment.interview.app.quiz.domain.Quiz;
 import com.mangkyu.employment.interview.app.quiz.domain.QuizLevel;
 import org.mapstruct.Mapper;
 import org.mapstruct.factory.Mappers;
 
-import java.sql.Timestamp;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -18,13 +18,13 @@ public interface QuizConverter {
 
     QuizEntity toQuizEntity(final AddQuizRequest addQuizRequest);
 
-    default GetQuizResponse toGetQuizResponse(final QuizEntity quizEntity) {
+    Quiz toQuiz(final QuizEntity quizEntity);
+
+    default GetQuizResponse toGetQuizResponse(final Quiz quiz) {
         return GetQuizResponse.builder()
-                .resourceId(quizEntity.getResourceId())
-                .title(quizEntity.getTitle())
-                .category(quizEntity.getQuizCategory().getTitle())
-                .quizLevelList(convert(quizEntity.getQuizLevel()))
-                .createdAt(Timestamp.valueOf(quizEntity.getCreatedAt()).getTime())
+                .title(quiz.getTitle())
+                .category(quiz.getQuizCategory().getTitle())
+                .quizLevelList(convert(quiz.getQuizLevel()))
                 .build();
     };
 
@@ -34,4 +34,7 @@ public interface QuizConverter {
                 .collect(Collectors.toList());
     }
 
+    QuizEntity toQuizEntity(final Quiz quiz);
+
+    List<QuizEntity> toQuizEntities(List<Quiz> quizList);
 }
