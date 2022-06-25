@@ -6,6 +6,7 @@ import com.mangkyu.employment.interview.app.quiz.domain.port.out.SendQuizPort;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.annotation.Profile;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Component;
@@ -23,15 +24,16 @@ import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 @Component
+@Profile("!local")
 @Slf4j
-public class SendQuizMailAdapter implements SendQuizPort {
+public class RealSendQuizMailAdapter implements SendQuizPort {
 
     private final JavaMailSender mailSender;
     private final String START_MAIL_FORMAT;
     private final String BODY_MAIL_FORMAT;
     private final String END_MAIL_FORMAT;
 
-    public SendQuizMailAdapter(final JavaMailSender mailSender) throws IOException {
+    public RealSendQuizMailAdapter(final JavaMailSender mailSender) throws IOException {
         this.mailSender = mailSender;
         START_MAIL_FORMAT = FileUtils.readFileText("classpath:static/mail/startMailFormat.html");
         BODY_MAIL_FORMAT = FileUtils.readFileText("classpath:static/mail/bodyMailFormat.html");
@@ -93,7 +95,7 @@ public class SendQuizMailAdapter implements SendQuizPort {
     @NoArgsConstructor(access = AccessLevel.PRIVATE)
     static class FileUtils {
 
-        public static String readFileText(final String filePath) throws IOException {
+        static String readFileText(final String filePath) throws IOException {
             final File file = ResourceUtils.getFile(filePath);
             final InputStream inputStream = new FileInputStream(file);
             final byte[] byteData = FileCopyUtils.copyToByteArray(inputStream);
@@ -104,7 +106,7 @@ public class SendQuizMailAdapter implements SendQuizPort {
     @NoArgsConstructor(access = AccessLevel.PRIVATE)
     static class DateUtils {
 
-        public static String getCurrentDate(final LocalDateTime localDateTime) {
+        static String getCurrentDate(final LocalDateTime localDateTime) {
             final DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy/MM/dd");
             return dateTimeFormatter.format(localDateTime);
         }
